@@ -9,12 +9,17 @@ defmodule PentoWeb.WrongLive do
       number_to_be_guessed: random_number(),
       status: :playing,
       score: 0,
-      message: "Guess a number.",
+      message: "Guess a number."
     }
   end
 
-  def mount(_params, _session, socket) do
-    {:ok, socket}
+  def mount(_params, session, socket) do
+    initial_state =
+      initial_state()
+      |> Map.put(:user, Pento.Accounts.get_user_by_session_token(session["user_token"]))
+      |> Map.put(:session_id, session["live_socket_id"])
+
+    {:ok, assign(socket, initial_state)}
   end
 
   def handle_params(_params, _session, socket) do
@@ -39,9 +44,12 @@ defmodule PentoWeb.WrongLive do
         <%= live_patch("Restart", to: "/guess", replace: true) %>
       <h2>
     <% end %>
+    <pre>
+      <%= @user.email %>
+      <%= @session_id %>
+    </pre>
     """
   end
-
 
   def handle_event("guess", _data, %{assigns: %{status: :won}} = socket), do: {:noreply, socket}
 
@@ -74,5 +82,4 @@ defmodule PentoWeb.WrongLive do
   defp time() do
     DateTime.utc_now() |> to_string()
   end
-
 end
