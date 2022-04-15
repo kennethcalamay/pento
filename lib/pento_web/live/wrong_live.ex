@@ -5,7 +5,7 @@ defmodule PentoWeb.WrongLive do
 
   def initial_state() do
     %{
-      time: time,
+      time: time(),
       number_to_be_guessed: random_number(),
       status: :playing,
       score: 0,
